@@ -24,7 +24,7 @@
         }
 
         /* -------------------------------------------
-           TOP BAR & AUTH
+            TOP BAR & AUTH
         ------------------------------------------- */
         .top-header-bar {
             position: fixed;
@@ -140,7 +140,7 @@
         }
 
         /* -------------------------------------------
-           PROFIL MODAL (POP-UP) Med MC-Verificering
+            PROFIL MODAL (POP-UP)
         ------------------------------------------- */
         .modal-overlay {
             display: none;
@@ -263,7 +263,7 @@
         }
 
         /* -------------------------------------------
-           SERVER LISTE CONTAINER
+            SERVER LISTE CONTAINER
         ------------------------------------------- */
         .container {
             max-width: 800px;
@@ -384,13 +384,12 @@
     </div>
 
     <script>
-        // DISCORD CONFIG (Implicit Grant)
+        // DISCORD CONFIG
         const CLIENT_ID = '1506654272794792067';
         const REDIRECT_URI = 'https://blazqeq.github.io/tracker/';
         const AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
 
         let currentUser = JSON.parse(localStorage.getItem('user')) || null;
-
         document.getElementById('loginBtn').href = AUTH_URL;
 
         async function handleDiscordAuth() {
@@ -406,7 +405,7 @@
                     });
                     const data = await response.json();
                     currentUser = {
-                        id: data.id, // Vi gemmer Discord ID'et til MC-tjekket
+                        id: data.id,
                         name: data.username,
                         avatar: `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`
                     };
@@ -435,70 +434,49 @@
             }
         }
 
-        // DROPDOWN TOGGLE
         document.getElementById('userBadge').onclick = (e) => {
             e.stopPropagation();
             const dd = document.getElementById('authDropdown');
             dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
         };
 
-        window.onclick = () => {
-            document.getElementById('authDropdown').style.display = 'none';
-        };
+        window.onclick = () => { document.getElementById('authDropdown').style.display = 'none'; };
 
-        // LOG UD
         document.getElementById('logoutBtn').onclick = () => {
             localStorage.removeItem('user');
             location.reload();
         };
 
-        // POPUP VINDU FUNKTIONER + MINECRAFT API ID MATCH
         async function openProfile() {
             if (!currentUser) return;
-            
             document.getElementById('modalAvatar').src = currentUser.avatar;
             document.getElementById('modalName').innerText = currentUser.name;
             const mcBox = document.getElementById('mcVerificationBox');
             mcBox.innerHTML = `<div style="font-size: 0.85rem; color: #64748b;">Søger efter tilknyttet Minecraft-konto...</div>`;
-            
             document.getElementById('modalOverlay').style.display = 'flex';
 
             try {
-                // Henter listen af spillere fra SuperAwesomes API
                 const res = await fetch('https://api.superawesome.dk/players/');
                 const playersData = await res.json();
-                
-                // Konverterer til array hvis det er nødvendigt
                 const playersArray = Array.isArray(playersData) ? playersData : Object.values(playersData);
-
-                // Leder efter spilleren, hvor discordID matcher brugerens loggede ind Discord ID
                 const matchedPlayer = playersArray.find(player => player.discordID === currentUser.id);
 
                 if (matchedPlayer) {
-                    // Hvis der findes et korrekt match på Discord ID'et
                     mcBox.innerHTML = `
                         <img src="https://skins.mcstats.com/skull/${matchedPlayer.uuid}" class="mc-avatar-large" alt="">
                         <div style="font-weight: 700; color: #0f172a;">${matchedPlayer.username}</div>
                         <div class="mc-verified-tag">✓ Verificeret Minecraft-konto</div>
                     `;
                 } else {
-                    // Hvis der IKKE findes en konto tilknyttet dette Discord ID
-                    mcBox.innerHTML = `
-                        <div class="mc-unverified-tag">⚠ Ingen Minecraft-konto fundet</div>
-                        <div style="font-size: 0.8rem; color: #64748b;">Dit Discord ID er ikke tilknyttet en Minecraft konto i systemet.</div>
-                    `;
+                    mcBox.innerHTML = `<div class="mc-unverified-tag">⚠ Ingen Minecraft-konto fundet</div>`;
                 }
             } catch (error) {
-                console.error("Fejl i MC-verificeringstjek:", error);
-                mcBox.innerHTML = `<div style="font-size: 0.85rem; color: #ef4444;">Kunne ikke verificere Minecraft-status lige nu.</div>`;
+                mcBox.innerHTML = `<div style="font-size: 0.85rem; color: #ef4444;">Kunne ikke verificere.</div>`;
             }
         }
 
-        function closeProfile() {
-            document.getElementById('modalOverlay').style.display = 'none';
-        }
+        function closeProfile() { document.getElementById('modalOverlay').style.display = 'none'; }
 
-        // SERVER API LOGIK
         async function fetchServers() {
             const container = document.getElementById('serverContainer');
             container.innerHTML = '<div class="status-msg">Opdaterer...</div>';
@@ -512,7 +490,7 @@
         function renderServers(servers) {
             const container = document.getElementById('serverContainer');
             container.innerHTML = '';
-            servers.sort((a,b) => (b.online || 0) - (a.online || 0));
+            servers.sort((a,b) => (b.players || 0) - (a.players || 0));
 
             servers.forEach((s, i) => {
                 const wrapper = document.createElement('div');
@@ -530,7 +508,7 @@
                             <div class="rank">${i+1}</div>
                             <div class="server-name">${s.name || 'Server'}</div>
                         </div>
-                        <div class="player-count">${s.online || 0} online</div>
+                        <div class="player-count">${s.players || 0} online</div>
                     </div>
                     <div class="player-panel">${playerHTML}</div>`;
                 
