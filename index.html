@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperAwesome Server Status</title>
+    <style>
+        /* CSS Nulstilling & Globale styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Header sektion */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .btn-refresh {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-refresh:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Serverlisten / Accordion-container */
+        .server-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Server Wrapper holder både kortet og spillerlisten */
+        .server-wrapper {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .server-wrapper:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        /* Selve klik-området */
+        .server-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rank {
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 700;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+
+        .server-wrapper:first-child .rank {
+            background: #fef08a;
+            color: #854d0e;
+        }
+
+        .server-name {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 1.1rem;
+        }
+
+        .player-count {
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Spillerpanelet (Skjult som standard, glidende åbning) */
+        .player-panel {
+            max-height: 0;
+            opacity: 0;
+            background-color: #ffffff;
+            border-top: 0 solid #e2e8f0;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease, padding 0.3s ease, border-top 0.1s;
+            padding: 0 24px;
+        }
+
+        /* Når serveren er aktiv (åben) */
+        .server-wrapper.active {
+            border-color: #2563eb;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+        }
+
+        .server-wrapper.active .player-panel {
+            max-height: 400px;
+            opacity: 1;
+            padding: 20px 24px;
+            border-top: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+
+        /* Det visuelle grid for spillernavne */
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        /* Spiller-tagget er nu et flex-element for at holde hoved + navn på linje */
+        .player-tag {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Styling af Minecraft-hovedet */
+        .player-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            image-rendering: pixelated; /* Gør at Minecraft-hovedet forbliver skarpt og pixeleret */
+            background-color: #cbd5e1; /* Fallback farve mens det loader */
+        }
+
+        .player-name-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .no-players {
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .status-msg {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>Top SuperAwesome Servere</h1>
+                <p style="color: #64748b; font-size: 0.9rem;">Klik på en server for at se online spillere</p>
+            </div>
+            <button class="btn-refresh" id="refreshBtn">Opdater data</button>
+        </header>
+
+        <div class="server-list" id="serverContainer">
+            <div class="status-msg">Henter servere...</div>
+        </div>
+    </div>
+
+    <script>
+        const apiURL = 'https://api.superawesome.dk/servers/';
+        const container = document.getElementById('serverContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+
+        async function fetchServers() {
+            container.innerHTML = '<div class="status-msg">Opdaterer listen...</div>';
+            try {
+                const response = await fetch(apiURL);
+                if (!response.ok) throw new Error('Kunne ikke hente data');
+                const data = await response.json();
+                renderServers(data);
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div class="status-msg" style="color: #ef4444;">Kunne ikke hente live data. Prøv igen senere.</div>';
+            }
+        }
+
+        function renderServers(servers) {
+            let serverArray = Array.isArray(servers) ? servers : Object.values(servers);
+
+            if (serverArray.length === 0) {
+                container.innerHTML = '<div class="status-msg">Ingen servere fundet.</div>';
+                return;
+            }
+
+            // Sorter efter spillere online
+            serverArray.sort((a, b) => {
+                const playersA = a.online || a.players || 0;
+                const playersB = b.online || b.players || 0;
+                return playersB - playersA;
+            });
+
+            container.innerHTML = '';
+
+            serverArray.forEach((server, index) => {
+                const name = server.name || server.title || `Server #${index + 1}`;
+                const onlinePlayers = server.online || server.players || 0;
+                const maxPlayers = server.max || server.maxPlayers ? ` / ${server.max || server.maxPlayers}` : '';
+
+                const rawPlayerList = server.playersData || [];
+                
+                let playerHTML = `<div class="no-players">Ingen spillere online.</div>`;
+                
+                if (Array.isArray(rawPlayerList) && rawPlayerList.length > 0) {
+                    playerHTML = `<div class="player-grid">`;
+                    rawPlayerList.forEach(player => {
+                        const username = player.username || 'Ukendt';
+                        
+                        /* Her laver vi linket til Minecraft-hovedet.
+                          Jeg bruger 'username', men hvis mcstats foretrækker UUID, 
+                          kan du ændre det til player.uuid i stedet.
+                        */
+                        const skullUrl = `https://skins.mcstats.com/skull/${username}`;
+
+                        playerHTML += `
+                            <div class="player-tag">
+                                <img src="${skullUrl}" alt="${username}" class="player-avatar" onerror="this.style.display='none'">
+                                <span class="player-name-text">${username}</span>
+                            </div>
+                        `;
+                    });
+                    playerHTML += `</div>`;
+                }
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'server-wrapper';
+                wrapper.innerHTML = `
+                    <div class="server-card">
+                        <div class="server-info">
+                            <div class="rank">${index + 1}</div>
+                            <div class="server-name">${name}</div>
+                        </div>
+                        <div class="player-count">
+                            ${onlinePlayers}${maxPlayers} online
+                        </div>
+                    </div>
+                    <div class="player-panel">
+                        ${playerHTML}
+                    </div>
+                `;
+
+                const card = wrapper.querySelector('.server-card');
+                card.addEventListener('click', () => {
+                    const isAlreadyActive = wrapper.classList.contains('active');
+
+                    document.querySelectorAll('.server-wrapper').forEach(w => {
+                        w.classList.remove('active');
+                    });
+
+                    if (!isAlreadyActive) {
+                        wrapper.classList.add('active');
+                    }
+                });
+
+                container.appendChild(wrapper);
+            });
+        }
+
+        fetchServers();
+        refreshBtn.addEventListener('click', fetchServers);
+    </script>
+
+</body>
+</html>
