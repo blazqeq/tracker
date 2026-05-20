@@ -164,7 +164,7 @@
             gap: 10px;
         }
 
-        /* Spiller-tagget er nu et flex-element for at holde hoved + navn på linje */
+        /* Spiller-tagget er et flex-element for at holde hoved + navn på linje */
         .player-tag {
             display: flex;
             align-items: center;
@@ -271,12 +271,10 @@
                     playerHTML = `<div class="player-grid">`;
                     rawPlayerList.forEach(player => {
                         const username = player.username || 'Ukendt';
+                        const uuid = player.uuid;
                         
-                        /* Her laver vi linket til Minecraft-hovedet.
-                          Jeg bruger 'username', men hvis mcstats foretrækker UUID, 
-                          kan du ændre det til player.uuid i stedet.
-                        */
-                        const skullUrl = `https://skins.mcstats.com/skull/${username}`;
+                        /* Her henter vi kraniet/hovedet via spillerens UUID i stedet for navnet */
+                        const skullUrl = `https://skins.mcstats.com/skull/${uuid}`;
 
                         playerHTML += `
                             <div class="player-tag">
