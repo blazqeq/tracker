@@ -130,7 +130,7 @@
 
         .auth-dropdown .btn-logout {
             color: #ffffff;
-            background-color: #ef4444; /* Flot rød boks */
+            background-color: #ef4444;
             margin-top: 5px;
         }
 
@@ -254,6 +254,12 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-refresh:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
         }
 
         .server-list { display: flex; flex-direction: column; gap: 12px; }
@@ -288,6 +294,7 @@
         .player-tag { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0; }
         .player-avatar { width: 20px; height: 20px; border-radius: 2px; }
         .status-msg { text-align: center; color: #64748b; font-style: italic; }
+        .no-players { color: #94a3b8; font-style: italic; font-size: 0.9rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -337,12 +344,11 @@
     </div>
 
     <script>
-        // CONFIG
+        // DISCORD CONFIG (Implicit Grant)
         const CLIENT_ID = '1506654272794792067';
         const REDIRECT_URI = 'https://blazqeq.github.io/tracker/';
         const AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
 
-        // LOGIN LOGIK
         let currentUser = JSON.parse(localStorage.getItem('user')) || null;
 
         document.getElementById('loginBtn').href = AUTH_URL;
@@ -388,7 +394,7 @@
             }
         }
 
-        // DROPDOWN
+        // DROPDOWN TOGGLE
         document.getElementById('userBadge').onclick = (e) => {
             e.stopPropagation();
             const dd = document.getElementById('authDropdown');
@@ -405,7 +411,7 @@
             location.reload();
         };
 
-        // MODAL FUNKTIONER
+        // POPUP VINDU FUNKTIONER
         function openProfile() {
             if (!currentUser) return;
             document.getElementById('modalAvatar').src = currentUser.avatar;
