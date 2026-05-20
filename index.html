@@ -72,28 +72,41 @@
             box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
         }
 
-        /* Stor Discord knap til bunden */
-        .btn-discord-bottom {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+        /* Discord Login Knap oppe i højre hjørne */
+        .btn-discord-login-top {
             background-color: #5865F2;
             color: white;
             text-decoration: none;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 1.05rem;
-            margin-top: 25px;
-            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px -1px rgba(88, 101, 242, 0.2);
             transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            font-size: 0.95rem;
         }
 
-        .btn-discord-bottom:hover {
+        .btn-discord-login-top:hover {
             background-color: #4752C4;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.35);
+            box-shadow: 0 8px 12px -3px rgba(88, 101, 242, 0.3);
+        }
+
+        .user-logged-in-badge {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
         }
 
         /* Serverlisten / Accordion-container */
@@ -232,17 +245,17 @@
         }
 
         /* -------------------------------------------
-           FORSLAG SEKTION DESIGN (Matcher det eksisterende)
+           FORSLAG SEKTION DESIGN
         ------------------------------------------- */
         .suggestion-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .btn-suggest {
-            background-color: #f97316; /* Orange knap ligesom dit billede */
+            background-color: #f97316;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -261,48 +274,6 @@
             transform: translateY(-2px);
         }
 
-        /* Filter-knapper til forslag */
-        .filter-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .filter-btn span {
-            background: #cbd5e1;
-            color: #475569;
-            padding: 1px 6px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-        }
-
-        .filter-btn.active {
-            background: #0f172a;
-            color: white;
-            border-color: #0f172a;
-        }
-        .filter-btn.active span {
-            background: #334155;
-            color: white;
-        }
-
-        /* Forslags-kort */
         .suggestion-list {
             display: flex;
             flex-direction: column;
@@ -318,7 +289,6 @@
             gap: 20px;
         }
 
-        /* Stemme-system i venstre side */
         .vote-section {
             display: flex;
             flex-direction: column;
@@ -353,36 +323,16 @@
             margin: 4px 0;
         }
 
-        /* Indhold af forslaget */
         .suggestion-content {
             flex: 1;
-        }
-
-        .suggestion-title-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
         }
 
         .suggestion-title {
             font-weight: 700;
             font-size: 1.1rem;
             color: #0f172a;
+            margin-bottom: 6px;
         }
-
-        /* Status badges */
-        .badge {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        .badge-afventer { background: #fef3c7; color: #d97706; }
-        .badge-godkendt { background: #dbeafe; color: #2563eb; }
-        .badge-implementeret { background: #dcfce7; color: #166534; }
-        .badge-afvist { background: #fee2e2; color: #ef4444; }
 
         .suggestion-desc {
             color: #475569;
@@ -407,12 +357,12 @@
         }
 
         .user-avatar {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
         }
 
-        /* Modals (Login & Opret forslag-bokse) */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -475,8 +425,7 @@
             font-weight: 600;
         }
 
-        /* Login med Discord knap inde i boksen */
-        .btn-discord-login {
+        .btn-discord-login-modal {
             background: #5865F2;
             color: white;
             border: none;
@@ -490,8 +439,9 @@
             align-items: center;
             gap: 8px;
             margin-top: 15px;
+            text-decoration: none;
         }
-        .btn-discord-login:hover { background: #4752C4; }
+        .btn-discord-login-modal:hover { background: #4752C4; }
     </style>
 </head>
 <body>
@@ -502,38 +452,30 @@
                 <h1>SuperAwesomes mest populære servere!</h1>
                 <p style="color: #64748b; font-size: 0.9rem;">Klik på en server for at se online spillere</p>
             </div>
-            <div class="btn-group">
+            <div class="btn-group" id="headerBtnGroup">
                 <button class="btn-refresh" id="refreshBtn">Opdater</button>
+                <a href="#" class="btn-discord-login-top" id="topDiscordLoginBtn">
+                    <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+                    Log ind
+                </a>
             </div>
         </header>
 
         <div class="server-list" id="serverContainer">
             <div class="status-msg">Henter servere...</div>
         </div>
-
-        <a href="https://discord.gg/VYAXSGHdGB" target="_blank" class="btn-discord-bottom">
-            <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
-            Join vores Discord server!
-        </a>
     </div>
 
     <div class="container">
         <div class="suggestion-header">
             <div>
                 <h2 style="font-size: 1.5rem; font-weight: 700; color: #0f172a;">Forslag</h2>
-                <p style="color: #64748b; font-size: 0.9rem;">Del dine idéer og stem på andres forslag</p>
+                <p style="color: #64748b; font-size: 0.9rem;" id="loginStatusLabel">Del dine idéer og stem på andres forslag</p>
             </div>
             <button class="btn-suggest" id="newSuggestBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Nyt Forslag
             </button>
-        </div>
-
-        <div class="filter-group">
-            <button class="filter-btn active" data-filter="alle">Alle <span id="count-alle">0</span></button>
-            <button class="filter-btn" data-filter="godkendt">Godkendt <span id="count-godkendt">0</span></button>
-            <button class="filter-btn" data-filter="implementeret">Implementeret <span id="count-implementeret">0</span></button>
-            <button class="filter-btn" data-filter="afvist">Afvist <span id="count-afvist">0</span></button>
         </div>
 
         <div class="suggestion-list" id="suggestionContainer">
@@ -543,11 +485,11 @@
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <div class="modal-title">Log ind påkrævet</div>
-            <p style="color: #475569; font-size: 0.95rem; margin-bottom: 15px;">Du skal være logget ind med Discord for at kunne indsende et forslag på listen.</p>
-            <button class="btn-discord-login" id="discordLoginBtn">
+            <p style="color: #475569; font-size: 0.95rem; margin-bottom: 15px;">Du skal logge sikkert ind med din Discord profil for at indsende et forslag på listen.</p>
+            <a href="#" class="btn-discord-login-modal" id="modalDiscordLoginBtn">
                 <svg width="18" height="18" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
-                Forbind med Discord
-            </button>
+                Log ind med Discord
+            </a>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal('loginModal')">Annuller</button>
             </div>
@@ -560,7 +502,7 @@
             <form id="suggestionForm">
                 <div class="form-group">
                     <label for="sugTitle">Titel på forslag</label>
-                    <input type="text" id="sugTitle" required placeholder="F.eks. Stabil trading økonomi">
+                    <input type="text" id="sugTitle" required placeholder="Skriv en kort overskrift...">
                 </div>
                 <div class="form-group">
                     <label for="sugDesc">Beskrivelse</label>
@@ -575,6 +517,14 @@
     </div>
 
     <script>
+        // --- OAUTH CONFIGURATION ---
+        const CLIENT_ID = '1506654272794792067';
+        const REDIRECT_URI = window.location.origin + window.location.pathname; 
+        const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+        
+        document.getElementById('topDiscordLoginBtn').href = DISCORD_AUTH_URL;
+        document.getElementById('modalDiscordLoginBtn').href = DISCORD_AUTH_URL;
+
         // --- 1. SERVER-LISTE LOGIK ---
         const apiURL = 'https://api.superawesome.dk/servers/';
         const container = document.getElementById('serverContainer');
@@ -650,45 +600,65 @@
         refreshBtn.addEventListener('click', fetchServers);
 
 
-        // --- 2. FORSLAGS-SYSTEM MED SIMULERET DISCORD LOGIN ---
-        let currentUser = JSON.parse(localStorage.getItem('discordUser')) || null;
+        // --- 2. FORSLAGS-SYSTEM (FULDSTÆNDIG TOMT VED START) ---
+        let currentUser = JSON.parse(localStorage.getItem('realDiscordUser')) || null;
         
-        // Standard forslag til listen, hvis localstorage er tom (matcher dit billede!)
-        let defaultSuggestions = [
-            {
-                id: 1,
-                title: "Stabil trading økonomi",
-                desc: "Jeg synes det vil være mega fedt hvis man holdte en \"Stabil\" server økonomi. Det menes ved at det ikke bliver normalt at en spiller har 15.000.000 på sin balance og 4 double kister fyldt med rare items.",
-                user: { name: "just_exist", avatar: "https://cdn.discordapp.com/embed/avatars/1.png" },
-                time: "3 måneder siden",
-                votes: 42,
-                status: "implementeret",
-                voted: null
-            },
-            {
-                id: 2,
-                title: "Flere celler",
-                desc: "Flere celler til rådighed på fængsels-serveren tak!",
-                user: { name: "butler.dk", avatar: "https://cdn.discordapp.com/embed/avatars/2.png" },
-                time: "11 dage siden",
-                votes: 18,
-                status: "implementeret",
-                voted: null
-            }
-        ];
+        // Listen starter tom uden pre-genererede eksempler
+        let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
 
-        let suggestions = JSON.parse(localStorage.getItem('suggestions')) || defaultSuggestions;
-        if (!localStorage.getItem('suggestions')) {
-            localStorage.setItem('suggestions', JSON.stringify(suggestions));
-        }
-
-        let currentFilter = 'alle';
-
-        // Åbn/Luk Modals
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // Trigger når man klikker "Nyt forslag"
+        async function checkDiscordCallback() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+
+            if (accessToken) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                try {
+                    const userResponse = await fetch('https://discord.com/api/users/@me', {
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
+                    const userData = await userResponse.json();
+
+                    if (userData.username) {
+                        currentUser = {
+                            name: userData.username,
+                            avatar: userData.avatar 
+                                ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`
+                                : `https://cdn.discordapp.com/embed/avatars/${userData.discriminator % 5}.png`
+                        };
+                        localStorage.setItem('realDiscordUser', JSON.stringify(currentUser));
+                        updateUserUI();
+                        openModal('suggestModal');
+                    }
+                } catch (err) {
+                    console.error("Fejl under hentning af Discord bruger:", err);
+                }
+            } else {
+                updateUserUI();
+            }
+        }
+
+        function updateUserUI() {
+            const label = document.getElementById('loginStatusLabel');
+            const topBtn = document.getElementById('topDiscordLoginBtn');
+
+            if (currentUser) {
+                label.innerHTML = `Logget ind som: <span style="font-weight:700; color:#2563eb;">${currentUser.name}</span> &bull; Klar til at oprette forslag!`;
+                
+                topBtn.removeAttribute('href'); 
+                topBtn.className = "user-logged-in-badge";
+                topBtn.innerHTML = `
+                    <img src="${currentUser.avatar}" style="width:22px; height:22px; border-radius:50%;" alt="">
+                    <span>${currentUser.name}</span>
+                `;
+            } else {
+                label.innerText = "Del dine idéer og stem på andres forslag";
+            }
+        }
+
         document.getElementById('newSuggestBtn').addEventListener('click', () => {
             if (!currentUser) {
                 openModal('loginModal');
@@ -697,19 +667,6 @@
             }
         });
 
-        // Simuler Discord Login
-        document.getElementById('discordLoginBtn').addEventListener('click', () => {
-            // Vi laver en fiktiv Discord bruger (Du kan ændre navnet her)
-            currentUser = {
-                name: "Blazqeq",
-                avatar: "https://cdn.discordapp.com/embed/avatars/0.png"
-            };
-            localStorage.setItem('discordUser', JSON.stringify(currentUser));
-            closeModal('loginModal');
-            openModal('suggestModal'); // Går direkte til at oprette forslag
-        });
-
-        // Håndter indsendelse af nyt forslag
         document.getElementById('suggestionForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const title = document.getElementById('sugTitle').value;
@@ -722,109 +679,8 @@
                 user: currentUser,
                 time: "Lige nu",
                 votes: 1,
-                status: "afventer", // Standard status er afventer
                 voted: 'up'
             };
 
             suggestions.unshift(newSug);
             localStorage.setItem('suggestions', JSON.stringify(suggestions));
-            
-            document.getElementById('suggestionForm').reset();
-            closeModal('suggestModal');
-            renderSuggestions();
-        });
-
-        // Stemme logik
-        function vote(id, type) {
-            suggestions = suggestions.map(sug => {
-                if (sug.id === id) {
-                    if (sug.voted === type) {
-                        sug.votes += (type === 'up' ? -1 : 1);
-                        sug.voted = null;
-                    } else {
-                        if (sug.voted) {
-                            sug.votes += (type === 'up' ? 2 : -2);
-                        } else {
-                            sug.votes += (type === 'up' ? 1 : -1);
-                        }
-                        sug.voted = type;
-                    }
-                }
-                return sug;
-            });
-            localStorage.setItem('suggestions', JSON.stringify(suggestions));
-            renderSuggestions();
-        }
-
-        // Render forslag ud på skærmen
-        function renderSuggestions() {
-            const container = document.getElementById('suggestionContainer');
-            container.innerHTML = '';
-
-            // Opdater tællere på filter-knapper
-            document.getElementById('count-alle').innerText = suggestions.length;
-            document.getElementById('count-godkendt').innerText = suggestions.filter(s => s.status === 'godkendt').length;
-            document.getElementById('count-implementeret').innerText = suggestions.filter(s => s.status === 'implementeret').length;
-            document.getElementById('count-afvist').innerText = suggestions.filter(s => s.status === 'afvist').length;
-
-            // Filtrer listen
-            let filtered = suggestions;
-            if (currentFilter !== 'alle') {
-                filtered = suggestions.filter(s => s.status === currentFilter);
-            }
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="status-msg">Ingen forslag fundet i denne kategori.</div>';
-                return;
-            }
-
-            filtered.forEach(sug => {
-                const isUp = sug.voted === 'up' ? 'upvoted' : '';
-                const isDown = sug.voted === 'down' ? 'downvoted' : '';
-                
-                const card = document.createElement('div');
-                card.className = 'suggestion-card';
-                card.innerHTML = `
-                    <div class="vote-section">
-                        <button class="vote-btn ${isUp}" onclick="vote(${sug.id}, 'up')">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 14h6v8h4v-8h6l-8-8-8 8z"/></svg>
-                        </button>
-                        <div class="vote-count">${sug.votes}</div>
-                        <button class="vote-btn ${isDown}" onclick="vote(${sug.id}, 'down')">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20 10h-6v-8h-4v8h-6l8 8 8-8z"/></svg>
-                        </button>
-                    </div>
-                    <div class="suggestion-content">
-                        <div class="suggestion-title-row">
-                            <div class="suggestion-title">${sug.title}</div>
-                            <span class="badge badge-${sug.status}">${sug.status}</span>
-                        </div>
-                        <div class="suggestion-desc">${sug.desc}</div>
-                        <div class="suggestion-footer">
-                            <div class="user-info">
-                                <img src="${sug.user.avatar}" class="user-avatar" alt="">
-                                ${sug.user.name}
-                            </div>
-                            &bull; <span>${sug.time}</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Håndter filter-skift via klik
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.getAttribute('data-filter');
-                renderSuggestions();
-            });
-        });
-
-        // Start forslag ved indlæsning
-        renderSuggestions();
-    </script>
-</body>
-</html>
