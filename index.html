@@ -94,6 +94,30 @@
             box-shadow: 0 8px 12px -3px rgba(88, 101, 242, 0.3);
         }
 
+        /* Stor Discord knap til bunden */
+        .btn-discord-bottom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background-color: #5865F2;
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-top: 25px; /* Skaber luft under listen */
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .btn-discord-bottom:hover {
+            background-color: #4752C4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.35);
+        }
+
         /* Serverlisten / Accordion-container */
         .server-list {
             display: flex;
@@ -258,6 +282,11 @@
         <div class="server-list" id="serverContainer">
             <div class="status-msg">Henter servere...</div>
         </div>
+
+        <a href="https://discord.gg/VYAXSGHdGB" target="_blank" class="btn-discord-bottom">
+            <svg width="20" height="20" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+            Join vores Discord server!
+        </a>
     </div>
 
     <script>
