@@ -387,7 +387,7 @@
         // DISCORD CONFIG
         const CLIENT_ID = '1506654272794792067';
         const REDIRECT_URI = 'https://blazqeq.github.io/tracker/';
-        const AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+        const AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=email+guilds.join+connections`;
 
         let currentUser = JSON.parse(localStorage.getItem('user')) || null;
         document.getElementById('loginBtn').href = AUTH_URL;
