@@ -684,3 +684,76 @@
 
             suggestions.unshift(newSug);
             localStorage.setItem('suggestions', JSON.stringify(suggestions));
+            
+            document.getElementById('suggestionForm').reset();
+            closeModal('suggestModal');
+            renderSuggestions();
+        });
+
+        function vote(id, type) {
+            suggestions = suggestions.map(sug => {
+                if (sug.id === id) {
+                    if (sug.voted === type) {
+                        sug.votes += (type === 'up' ? -1 : 1);
+                        sug.voted = null;
+                    } else {
+                        if (sug.voted) {
+                            sug.votes += (type === 'up' ? 2 : -2);
+                        } else {
+                            sug.votes += (type === 'up' ? 1 : -1);
+                        }
+                        sug.voted = type;
+                    }
+                }
+                return sug;
+            });
+            localStorage.setItem('suggestions', JSON.stringify(suggestions));
+            renderSuggestions();
+        }
+
+        function renderSuggestions() {
+            const sugContainer = document.getElementById('suggestionContainer');
+            sugContainer.innerHTML = '';
+
+            if (suggestions.length === 0) {
+                sugContainer.innerHTML = '<div class="status-msg">Der er ikke oprettet nogen forslag endnu. Bliv den første!</div>';
+                return;
+            }
+
+            suggestions.forEach(sug => {
+                const isUp = sug.voted === 'up' ? 'upvoted' : '';
+                const isDown = sug.voted === 'down' ? 'downvoted' : '';
+                
+                const card = document.createElement('div');
+                card.className = 'suggestion-card';
+                card.innerHTML = `
+                    <div class="vote-section">
+                        <button class="vote-btn ${isUp}" onclick="vote(${sug.id}, 'up')">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M4 14h6v8h4v-8h6l-8-8-8 8z"/></svg>
+                        </button>
+                        <div class="vote-count">${sug.votes}</div>
+                        <button class="vote-btn ${isDown}" onclick="vote(${sug.id}, 'down')">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20 10h-6v-8h-4v8h-6l8 8 8-8z"/></svg>
+                        </button>
+                    </div>
+                    <div class="suggestion-content">
+                        <div class="suggestion-title">${sug.title}</div>
+                        <div class="suggestion-desc">${sug.desc}</div>
+                        <div class="suggestion-footer">
+                            <div class="user-info">
+                                <img src="${sug.user.avatar}" class="user-avatar" alt="">
+                                ${sug.user.name}
+                            </div>
+                            &bull; <span>${sug.time}</span>
+                        </div>
+                    </div>
+                `;
+                sugContainer.appendChild(card);
+            });
+        }
+
+        checkDiscordCallback();
+        renderSuggestions();
+    </script>
+</body>
+</html>
