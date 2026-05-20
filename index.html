@@ -52,6 +52,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            position: relative; /* Vigtigt for log ud dropdown position */
         }
 
         .btn-refresh {
@@ -97,6 +98,7 @@
             box-shadow: 0 8px 12px -3px rgba(88, 101, 242, 0.3);
         }
 
+        /* Bruger badge når logget ind */
         .user-logged-in-badge {
             background-color: #f1f5f9;
             color: #1e293b;
@@ -107,6 +109,46 @@
             align-items: center;
             gap: 8px;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        .user-logged-in-badge:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Dropdown menu til Log ud */
+        .logout-dropdown {
+            display: none;
+            position: absolute;
+            top: 105%;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            min-width: 130px;
+            overflow: hidden;
+        }
+
+        .logout-dropdown button {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: #ef4444; /* Rød farve som anmodet */
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .logout-dropdown button:hover {
+            background-color: #fef2f2;
         }
 
         /* Serverlisten / Accordion-container */
@@ -244,9 +286,7 @@
             color: #64748b;
         }
 
-        /* -------------------------------------------
-           FORSLAG SEKTION DESIGN
-        ------------------------------------------- */
+        /* FORSLAG SEKTION DESIGN */
         .suggestion-header {
             display: flex;
             justify-content: space-between;
@@ -454,10 +494,16 @@
             </div>
             <div class="btn-group" id="headerBtnGroup">
                 <button class="btn-refresh" id="refreshBtn">Opdater</button>
-                <a href="#" class="btn-discord-login-top" id="topDiscordLoginBtn">
-                    <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
-                    Log ind
-                </a>
+                
+                <div id="loginElementContainer" style="display: inline-block; position: relative;">
+                    <a href="#" class="btn-discord-login-top" id="topDiscordLoginBtn">
+                        <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+                        Log ind
+                    </a>
+                    <div class="logout-dropdown" id="logoutDropdownMenu">
+                        <button id="logoutSubmitBtn">Log ud</button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -517,10 +563,10 @@
     </div>
 
     <script>
-        // --- OAUTH CONFIGURATION ---
+        // --- OAUTH CONFIGURATION (Sikker response_type=token til GitHub Pages) ---
         const CLIENT_ID = '1506654272794792067';
-        const REDIRECT_URI = window.location.origin + window.location.pathname; 
-        const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+        const REDIRECT_URI = 'https://blazqeq.github.io/tracker/'; 
+        const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
         
         document.getElementById('topDiscordLoginBtn').href = DISCORD_AUTH_URL;
         document.getElementById('modalDiscordLoginBtn').href = DISCORD_AUTH_URL;
@@ -600,10 +646,8 @@
         refreshBtn.addEventListener('click', fetchServers);
 
 
-        // --- 2. FORSLAGS-SYSTEM (FULDSTÆNDIG TOMT VED START) ---
+        // --- 2. FORSLAGS-SYSTEM & BRUGER LOGIK ---
         let currentUser = JSON.parse(localStorage.getItem('realDiscordUser')) || null;
-        
-        // Listen starter tom uden pre-genererede eksempler
         let suggestions = JSON.parse(localStorage.getItem('suggestions')) || [];
 
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -641,23 +685,55 @@
             }
         }
 
+        // Håndterer design og dropdown log ud funktioner live
         function updateUserUI() {
             const label = document.getElementById('loginStatusLabel');
             const topBtn = document.getElementById('topDiscordLoginBtn');
+            const dropdown = document.getElementById('logoutDropdownMenu');
 
             if (currentUser) {
                 label.innerHTML = `Logget ind som: <span style="font-weight:700; color:#2563eb;">${currentUser.name}</span> &bull; Klar til at oprette forslag!`;
                 
+                // Forvandler login-knappen til en klikbar profilknap
                 topBtn.removeAttribute('href'); 
                 topBtn.className = "user-logged-in-badge";
                 topBtn.innerHTML = `
                     <img src="${currentUser.avatar}" style="width:22px; height:22px; border-radius:50%;" alt="">
                     <span>${currentUser.name}</span>
                 `;
+
+                // Tænd/sluk for "Log ud" dropdown menuen når man klikker på profilknappen
+                topBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    const isVisible = dropdown.style.display === 'block';
+                    dropdown.style.display = isVisible ? 'none' : 'block';
+                };
             } else {
                 label.innerText = "Del dine idéer og stem på andres forslag";
+                topBtn.href = DISCORD_AUTH_URL;
+                topBtn.className = "btn-discord-login-top";
+                topBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+                    Log ind
+                `;
+                topBtn.onclick = null;
+                dropdown.style.display = 'none';
             }
         }
+
+        // Luk dropdown-menuen hvis man klikker udenfor profil-knappen
+        window.addEventListener('click', () => {
+            document.getElementById('logoutDropdownMenu').style.display = 'none';
+        });
+
+        // Log ud funktion (Sletter data og genindlæser rent)
+        document.getElementById('logoutSubmitBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            localStorage.removeItem('realDiscordUser');
+            currentUser = null;
+            updateUserUI();
+            window.location.reload(); 
+        });
 
         document.getElementById('newSuggestBtn').addEventListener('click', () => {
             if (!currentUser) {
