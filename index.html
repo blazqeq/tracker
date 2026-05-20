@@ -20,7 +20,35 @@
             background-color: #f0f4f8;
             color: #1e293b;
             line-height: 1.6;
-            padding: 40px 20px;
+            padding: 60px 20px 40px 20px; /* Ekstra top-padding så der er plads til top-bar */
+            position: relative;
+        }
+
+        /* -------------------------------------------
+           NY TOP-BAR LOGIK (Højre hjørne & Midten)
+        ------------------------------------------- */
+        .top-welcome-msg {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: #ffffff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: none; /* Vises kun via JS når logget ind */
+            z-index: 999;
+            border: 1px solid #e2e8f0;
+        }
+
+        .top-right-auth {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
 
         .container {
@@ -48,13 +76,6 @@
             font-weight: 700;
         }
 
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            position: relative; /* Vigtigt for log ud dropdown position */
-        }
-
         .btn-refresh {
             background-color: #2563eb;
             color: white;
@@ -73,7 +94,7 @@
             box-shadow: 0 8px 12px -3px rgba(37, 99, 235, 0.3);
         }
 
-        /* Discord Login Knap oppe i højre hjørne */
+        /* Discord Login Knap helt oppe i højre hjørne */
         .btn-discord-login-top {
             background-color: #5865F2;
             color: white;
@@ -142,7 +163,7 @@
             font-weight: 600;
             font-family: inherit;
             font-size: 0.95rem;
-            color: #ef4444; /* Rød farve som anmodet */
+            color: #ef4444;
             cursor: pointer;
             transition: background-color 0.2s;
         }
@@ -486,24 +507,26 @@
 </head>
 <body>
 
+    <div class="top-welcome-msg" id="topWelcomeBar"></div>
+
+    <div class="top-right-auth" id="loginElementContainer">
+        <a href="#" class="btn-discord-login-top" id="topDiscordLoginBtn">
+            <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+            Log ind
+        </a>
+        <div class="logout-dropdown" id="logoutDropdownMenu">
+            <button id="logoutSubmitBtn">Log ud</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <div>
                 <h1>SuperAwesomes mest populære servere!</h1>
                 <p style="color: #64748b; font-size: 0.9rem;">Klik på en server for at se online spillere</p>
             </div>
-            <div class="btn-group" id="headerBtnGroup">
+            <div>
                 <button class="btn-refresh" id="refreshBtn">Opdater</button>
-                
-                <div id="loginElementContainer" style="display: inline-block; position: relative;">
-                    <a href="#" class="btn-discord-login-top" id="topDiscordLoginBtn">
-                        <svg width="16" height="16" viewBox="0 0 127.14 96.36" fill="currentColor"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.71-10.93,68.6,68.6,0,0,1-10.57-5.06c.9-.66,1.77-1.34,2.6-2a75.58,75.58,0,0,0,72.7,0c.83.69,1.7,1.37,2.6-2a68.43,68.43,0,0,1-10.57,5.06,74.83,74.83,0,0,0,6.71,10.93,105.73,105.73,0,0,0,31-18.83C129.56,50.7,123.75,27.84,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
-                        Log ind
-                    </a>
-                    <div class="logout-dropdown" id="logoutDropdownMenu">
-                        <button id="logoutSubmitBtn">Log ud</button>
-                    </div>
-                </div>
             </div>
         </header>
 
@@ -563,7 +586,7 @@
     </div>
 
     <script>
-        // --- OAUTH CONFIGURATION (Sikker response_type=token til GitHub Pages) ---
+        // --- OAUTH CONFIGURATION ---
         const CLIENT_ID = '1506654272794792067';
         const REDIRECT_URI = 'https://blazqeq.github.io/tracker/'; 
         const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20email`;
@@ -685,16 +708,20 @@
             }
         }
 
-        // Håndterer design og dropdown log ud funktioner live
         function updateUserUI() {
             const label = document.getElementById('loginStatusLabel');
             const topBtn = document.getElementById('topDiscordLoginBtn');
             const dropdown = document.getElementById('logoutDropdownMenu');
+            const welcomeBar = document.getElementById('topWelcomeBar');
 
             if (currentUser) {
                 label.innerHTML = `Logget ind som: <span style="font-weight:700; color:#2563eb;">${currentUser.name}</span> &bull; Klar til at oprette forslag!`;
                 
-                // Forvandler login-knappen til en klikbar profilknap
+                // Opdater velkomstbeskeden i midten
+                welcomeBar.innerText = `Velkommen ${currentUser.name}`;
+                welcomeBar.style.display = 'block';
+
+                // Gør login-knappen til en profil-badge oppe i højre hjørne
                 topBtn.removeAttribute('href'); 
                 topBtn.className = "user-logged-in-badge";
                 topBtn.innerHTML = `
@@ -702,7 +729,6 @@
                     <span>${currentUser.name}</span>
                 `;
 
-                // Tænd/sluk for "Log ud" dropdown menuen når man klikker på profilknappen
                 topBtn.onclick = function(e) {
                     e.stopPropagation();
                     const isVisible = dropdown.style.display === 'block';
@@ -710,6 +736,9 @@
                 };
             } else {
                 label.innerText = "Del dine idéer og stem på andres forslag";
+                welcomeBar.style.display = 'none';
+                welcomeBar.innerText = '';
+
                 topBtn.href = DISCORD_AUTH_URL;
                 topBtn.className = "btn-discord-login-top";
                 topBtn.innerHTML = `
@@ -721,12 +750,10 @@
             }
         }
 
-        // Luk dropdown-menuen hvis man klikker udenfor profil-knappen
         window.addEventListener('click', () => {
             document.getElementById('logoutDropdownMenu').style.display = 'none';
         });
 
-        // Log ud funktion (Sletter data og genindlæser rent)
         document.getElementById('logoutSubmitBtn').addEventListener('click', (e) => {
             e.stopPropagation();
             localStorage.removeItem('realDiscordUser');
