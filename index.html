@@ -10,27 +10,26 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 40px 20px; }
         .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 40px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        /* Smooth Fade */
-        #serverContainer { transition: opacity 0.3s ease-in-out; opacity: 1; }
+        #serverContainer { transition: opacity 0.4s ease-in-out; opacity: 1; min-height: 200px; }
         .fade-out { opacity: 0; }
 
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .refresh-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.1s; }
-        .refresh-btn:active { transform: scale(0.95); }
+        .refresh-btn { background: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
         .server-wrapper { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
         .server-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; cursor: pointer; }
+        
         .rank-badge { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; margin-right: 15px; color: #64748b; background: #e2e8f0; }
         .rank-1 { background: #fde047; color: #854d0e; }
 
         .player-panel { max-height: 0; opacity: 0; transition: 0.4s ease-in-out; overflow: hidden; }
-        .server-wrapper.active .player-panel { max-height: 400px; opacity: 1; padding: 20px 24px; border-top: 1px solid #e2e8f0; }
+        .server-wrapper.active .player-panel { max-height: 350px; opacity: 1; padding: 20px 24px; border-top: 1px solid #e2e8f0; overflow-y: auto; }
+        
         .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-        .player-tag { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0; }
+        .player-tag { display: flex; align-items: center; gap: 8px; background: #fff; padding: 6px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #e2e8f0; }
         .player-avatar { width: 20px; height: 20px; border-radius: 4px; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal { display: none; position: fixed; top:0; left:0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; }
         .uuid-display { font-size: 0.7rem; color: #94a3b8; margin-bottom: 15px; word-break: break-all; }
     </style>
@@ -42,7 +41,7 @@
             <h1>SuperAwesome Tracker</h1>
             <button class="refresh-btn" onclick="refreshData()">Opdater</button>
         </header>
-        <div id="serverContainer">Indlæser...</div>
+        <div id="serverContainer">Indlæser servere...</div>
     </div>
 
     <div class="modal" id="playerModal" onclick="this.style.display='none'">
@@ -58,7 +57,7 @@
         async function refreshData() {
             const container = document.getElementById('serverContainer');
             container.classList.add('fade-out');
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 400));
             await fetchServers();
             container.classList.remove('fade-out');
         }
@@ -66,7 +65,7 @@
         async function fetchAndShowPlayer(username, uuid) {
             document.getElementById('modalAvatar').src = `https://skins.mcstats.com/skull/${uuid}`;
             document.getElementById('modalName').innerText = username;
-            document.getElementById('modalUuid').innerText = uuid; // Her indsættes UUID
+            document.getElementById('modalUuid').innerText = uuid;
             document.getElementById('modalDetails').innerText = "Henter data...";
             document.getElementById('playerModal').style.display = 'flex';
             try {
@@ -80,56 +79,56 @@
             try {
                 const res = await fetch('https://api.superawesome.dk/servers/');
                 const data = await res.json();
-                renderServers(Object.values(data));
-            } catch { document.getElementById('serverContainer').innerHTML = 'Kunne ikke hente data.'; }
-        }
-
-        async function renderServers(servers) {
-            const container = document.getElementById('serverContainer');
-            container.innerHTML = '';
-            servers.sort((a,b) => (b.players || 0) - (a.players || 0));
-            
-            for (let i = 0; i < servers.length; i++) {
-                let s = servers[i];
-                let players = s.playersData || [];
-                let playerHTML = '<div style="color:#64748b;">Ingen spillere fundet.</div>';
-
-                if (players.length > 0) {
-                    let detailed = await Promise.all(players.map(async p => {
-                        try {
-                            const res = await fetch(`https://api.superawesome.dk/players/${p.username}`);
-                            const d = await res.json();
-                            return { ...p, points: d.playerPoints || 0 };
-                        } catch { return { ...p, points: 0 }; }
-                    }));
-                    detailed.sort((a, b) => b.points - a.points);
-                    playerHTML = detailed.map(p => `
-                        <div class="player-tag" onclick="fetchAndShowPlayer('${p.username}', '${p.uuid}')">
-                            <img src="https://skins.mcstats.com/skull/${p.uuid}" class="player-avatar">
-                            <span>${p.username}</span>
-                        </div>`).join('');
-                }
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'server-wrapper';
-                wrapper.innerHTML = `
-                    <div class="server-card">
-                        <div style="display:flex; align-items:center;">
-                            <div class="rank-badge ${i === 0 ? 'rank-1' : ''}">${i + 1}</div>
-                            <div style="font-weight:600;">${s.name || 'Server'}</div>
-                        </div>
-                        <div style="background:#dcfce7; color:#166534; padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700;">${s.players || 0} online</div>
-                    </div>
-                    <div class="player-panel"><div class="player-grid">${playerHTML}</div></div>`;
+                const container = document.getElementById('serverContainer');
+                container.innerHTML = '';
                 
-                wrapper.querySelector('.server-card').onclick = () => {
-                    const isOpen = wrapper.classList.contains('active');
-                    document.querySelectorAll('.server-wrapper').forEach(w => w.classList.remove('active'));
-                    if (!isOpen) wrapper.classList.add('active');
-                };
-                container.appendChild(wrapper);
-            }
+                const servers = Object.values(data);
+                servers.sort((a,b) => (b.players || 0) - (a.players || 0));
+
+                for (let i = 0; i < servers.length; i++) {
+                    const s = servers[i];
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'server-wrapper';
+                    
+                    let players = s.playersData || [];
+                    let playerHTML = '<div style="color:#64748b;">Ingen spillere online.</div>';
+
+                    if (players.length > 0) {
+                        const detailed = await Promise.all(players.map(async p => {
+                            try {
+                                const r = await fetch(`https://api.superawesome.dk/players/${p.username}`);
+                                const d = await r.json();
+                                return { ...p, points: d.playerPoints || 0 };
+                            } catch { return { ...p, points: 0 }; }
+                        }));
+                        detailed.sort((a, b) => b.points - a.points);
+                        playerHTML = `<div class="player-grid">` + detailed.map(p => `
+                            <div class="player-tag" onclick="fetchAndShowPlayer('${p.username}', '${p.uuid}')">
+                                <img src="https://skins.mcstats.com/skull/${p.uuid}" class="player-avatar">
+                                <span>${p.username}</span>
+                            </div>`).join('') + `</div>`;
+                    }
+
+                    wrapper.innerHTML = `
+                        <div class="server-card">
+                            <div style="display:flex; align-items:center;">
+                                <div class="rank-badge ${i === 0 ? 'rank-1' : ''}">${i + 1}</div>
+                                <div style="font-weight:600;">${s.name || 'Server'}</div>
+                            </div>
+                            <div style="background:#dcfce7; color:#166534; padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700;">${s.players || 0} online</div>
+                        </div>
+                        <div class="player-panel">${playerHTML}</div>`;
+                    
+                    wrapper.querySelector('.server-card').onclick = () => {
+                        const isOpen = wrapper.classList.contains('active');
+                        document.querySelectorAll('.server-wrapper').forEach(w => w.classList.remove('active'));
+                        if (!isOpen) wrapper.classList.add('active');
+                    };
+                    container.appendChild(wrapper);
+                }
+            } catch { document.getElementById('serverContainer').innerHTML = 'Fejl ved indlæsning.'; }
         }
+        
         fetchServers();
     </script>
 </body>
