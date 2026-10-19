@@ -154,7 +154,7 @@
         .mc-icon.pink { background-color: #ff55ff; box-shadow: 0 0 10px rgba(255,85,255,0.4); }
         .mc-icon.white { background-color: #ffffff; box-shadow: 0 0 10px rgba(255,255,255,0.4); }
 
-        /* Minecraft Tooltip */
+        /* Minecraft Filter Tooltip */
         .mc-tooltip {
             visibility: hidden;
             opacity: 0;
@@ -272,7 +272,7 @@
             border-radius: 20px;
             border: 1px solid var(--border-color);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
+            overflow: visible; /* Vigtigt for at overshoote tooltip */
             display: none;
         }
 
@@ -329,13 +329,13 @@
 
         tbody tr:hover {
             background-color: rgba(255, 255, 255, 0.03);
-            transform: scale(1.002);
         }
 
         td {
             padding: 20px 20px;
             font-size: 0.95rem;
             vertical-align: middle;
+            position: relative;
         }
 
         /* Custom Badges */
@@ -400,6 +400,12 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* SPILLERE TOOLTIP STYLING */
+        .player-count-container {
+            position: relative;
+            display: inline-block;
+        }
+
         .player-count {
             font-weight: 600;
             color: #38bdf8;
@@ -407,6 +413,75 @@
             padding: 6px 12px;
             border-radius: 8px;
             display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .player-count:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+        }
+
+        .players-hover-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            width: 220px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 200;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+        }
+
+        .player-count-container:hover .players-hover-tooltip {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        .players-tooltip-header {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 0;
+        }
+
+        .player-head-img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            image-rendering: pixelated;
+        }
+
+        .player-name-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .version-tag {
@@ -562,10 +637,36 @@
                 return server.players;
             } else if (Array.isArray(server.players)) {
                 return server.players.length;
+            } else if (Array.isArray(server.playersData)) {
+                return server.playersData.length;
             } else if (typeof server.players === 'object' && server.players !== null) {
                 return Object.keys(server.players).length;
             }
             return 0;
+        }
+
+        function extractPlayersList(server) {
+            // Tjekker om spillerdata findes i server.playersData eller server.players
+            let players = [];
+            if (Array.isArray(server.playersData)) {
+                players = server.playersData;
+            } else if (Array.isArray(server.players)) {
+                players = server.players;
+            } else if (typeof server.players === 'object' && server.players !== null) {
+                players = Object.values(server.players);
+            }
+
+            return players.map(p => {
+                if (typeof p === 'string') {
+                    return { username: p, identifier: p };
+                } else if (typeof p === 'object' && p !== null) {
+                    return { 
+                        username: p.username || p.name || 'Spiller', 
+                        identifier: p.uuid || p.username || 'steve' 
+                    };
+                }
+                return { username: 'Spiller', identifier: 'steve' };
+            });
         }
 
         function toggleSort() {
@@ -670,12 +771,36 @@
                     : '<span class="badge badge-whitelist-false">Åben for alle</span>';
 
                 const playerCount = getPlayerCount(server);
+                const playerList = extractPlayersList(server);
+
+                // Byg listen af spillere med deres heads
+                let playerItemsHtml = '';
+                if (playerList.length > 0) {
+                    playerItemsHtml = playerList.map(p => `
+                        <div class="player-list-item">
+                            <img class="player-head-img" src="https://mc-heads.net/avatar/${p.identifier}/24" alt="${p.username}">
+                            <span class="player-name-text">${p.username}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    playerItemsHtml = '<div style="font-size:0.8rem; color:#94a3b8;">Ingen detaljer fundet</div>';
+                }
+
+                const playersCellHtml = `
+                    <div class="player-count-container">
+                        <span class="player-count">${playerCount} / ${server.maxPlayers ?? '?'}</span>
+                        <div class="players-hover-tooltip">
+                            <div class="players-tooltip-header">Online Spillere (${playerList.length})</div>
+                            ${playerItemsHtml}
+                        </div>
+                    </div>
+                `;
 
                 row.innerHTML = `
                     <td>${badgeHtml}</td>
                     <td><span class="server-name">${server.name || server.serverName || 'Ukendt'}</span></td>
                     <td><span class="category-pill">${server.category || 'Ingen'}</span></td>
-                    <td><span class="player-count">${playerCount} / ${server.maxPlayers ?? '?'}</span></td>
+                    <td>${playersCellHtml}</td>
                     <td>${whitelistBadge}</td>
                     <td><span class="version-tag">${server.version || 'Ukendt'}</span></td>
                     <td><div class="description">${server.descriptionLong || server.description || 'Ingen beskrivelse tilgængelig'}</div></td>
