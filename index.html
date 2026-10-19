@@ -272,7 +272,7 @@
             border-radius: 20px;
             border: 1px solid var(--border-color);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            overflow: visible; /* Vigtigt for at overshoote tooltip */
+            overflow: visible;
             display: none;
         }
 
@@ -523,12 +523,12 @@
     <!-- Stats i øverste højre hjørne -->
     <div class="top-stats-badge">
         <div class="top-stats-item">
-            <span>🟢 Spillere i alt:</span>
+            <span>🟢 Spillere der vises:</span>
             <span id="totalPlayers" class="value">0</span>
         </div>
         <div class="top-stats-divider"></div>
         <div class="top-stats-item">
-            <span>🖥️ Servere:</span>
+            <span>🖥️ Servere der vises:</span>
             <span id="totalServers" class="value">0</span>
         </div>
     </div>
@@ -646,7 +646,6 @@
         }
 
         function extractPlayersList(server) {
-            // Tjekker om spillerdata findes i server.playersData eller server.players
             let players = [];
             if (Array.isArray(server.playersData)) {
                 players = server.playersData;
@@ -682,14 +681,6 @@
             const tableContainerEl = document.getElementById('tableContainer');
 
             const activeServers = rawFetchedServers.filter(s => getPlayerCount(s) > 0);
-
-            // Beregn total online spillere & servere på tværs af alle aktive servere
-            const grandTotalPlayers = activeServers.reduce((sum, s) => sum + getPlayerCount(s), 0);
-            const grandTotalServers = activeServers.length;
-
-            // Opdater badgen i øverste hjørne
-            document.getElementById('totalPlayers').textContent = grandTotalPlayers;
-            document.getElementById('totalServers').textContent = grandTotalServers;
 
             const countNoWhite = activeServers.filter(s => s.whitelist === "false" || s.whitelist === false).length;
             const countWhite = activeServers.filter(s => s.whitelist === "true" || s.whitelist === true).length;
@@ -728,6 +719,7 @@
 
             tipViser.textContent = `Viser: ${currentlyShownCount} servere`;
 
+            // Filtrér serverne ud fra det valgte filter
             const filteredServers = activeServers.filter(server => {
                 const isWhitelisted = server.whitelist === "true" || server.whitelist === true;
                 const isNotWhitelisted = server.whitelist === "false" || server.whitelist === false;
@@ -736,6 +728,14 @@
                 if (whitelistFilterMode === 'on') return isWhitelisted;
                 return true;
             });
+
+            // Beregn spillere & servere DER VISES LIGE NU
+            const shownTotalPlayers = filteredServers.reduce((sum, s) => sum + getPlayerCount(s), 0);
+            const shownTotalServers = filteredServers.length;
+
+            // Opdater badgen i øverste højre hjørne med de synlige tal
+            document.getElementById('totalPlayers').textContent = shownTotalPlayers;
+            document.getElementById('totalServers').textContent = shownTotalServers;
 
             if (filteredServers.length === 0) {
                 statusEl.style.display = 'block';
@@ -764,7 +764,6 @@
                     badgeHtml = '<span class="badge badge-vip">VIP</span>';
                 }
 
-                // Whitelist kolonne badge
                 const isWhitelisted = server.whitelist === "true" || server.whitelist === true;
                 let whitelistBadge = isWhitelisted 
                     ? '<span class="badge badge-whitelist-true">Whitelisted</span>' 
@@ -773,7 +772,6 @@
                 const playerCount = getPlayerCount(server);
                 const playerList = extractPlayersList(server);
 
-                // Byg listen af spillere med deres heads
                 let playerItemsHtml = '';
                 if (playerList.length > 0) {
                     playerItemsHtml = playerList.map(p => `
