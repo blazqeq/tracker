@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperAwesome Serverliste</title>
+    <title>SuperAwesome Servere</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -93,7 +93,7 @@
         /* Header Styling */
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
         }
 
@@ -111,6 +111,69 @@
             color: var(--text-muted);
             font-size: 1.05rem;
             margin-bottom: 16px;
+        }
+
+        /* Søgefelt Styling */
+        .search-container {
+            margin: 20px auto;
+            max-width: 580px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 44px 14px 44px;
+            background: rgba(18, 22, 31, 0.85);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 15px var(--primary-glow);
+            background: rgba(24, 30, 42, 0.95);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 14px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: none;
+            transition: color 0.2s;
+        }
+
+        .clear-btn:hover {
+            color: #ffffff;
         }
 
         /* Minecraft Style Toggle Button & Tooltip Container */
@@ -400,7 +463,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* SPILLERE TOOLTIP STYLING */
+        /* SPILLERE TOOLTIP STYLING & HOVER SCROLL */
         .player-count-container {
             position: relative;
             display: inline-block;
@@ -428,26 +491,56 @@
             visibility: hidden;
             opacity: 0;
             position: absolute;
-            bottom: 125%;
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background: #0f172a;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: #090e17;
+            border: 1px solid rgba(56, 189, 248, 0.35);
             border-radius: 12px;
             padding: 12px;
-            width: 220px;
+            width: 250px;
             max-height: 250px;
             overflow-y: auto;
             z-index: 200;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.85);
             transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-            pointer-events: none;
+            pointer-events: auto;
+            margin-bottom: 8px;
         }
 
-        .player-count-container:hover .players-hover-tooltip {
+        .players-hover-tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: transparent;
+        }
+
+        .player-count-container:hover .players-hover-tooltip,
+        .players-hover-tooltip:hover {
             visibility: visible;
             opacity: 1;
-            transform: translateX(-50%) translateY(-4px);
+            transform: translateX(-50%) translateY(-2px);
+        }
+
+        .players-hover-tooltip::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .players-hover-tooltip::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .players-hover-tooltip::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.4);
+            border-radius: 8px;
+        }
+
+        .players-hover-tooltip::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.7);
         }
 
         .players-tooltip-header {
@@ -459,13 +552,31 @@
             margin-bottom: 8px;
             padding-bottom: 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: -12px;
+            background: #090e17;
+            padding-top: 4px;
+            z-index: 2;
         }
 
         .player-list-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 4px 0;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .player-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .player-info-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
         }
 
         .player-head-img {
@@ -473,15 +584,39 @@
             height: 24px;
             border-radius: 4px;
             image-rendering: pixelated;
+            flex-shrink: 0;
         }
 
         .player-name-text {
-            font-size: 0.85rem;
+            font-size: 0.83rem;
             font-weight: 600;
             color: #f1f5f9;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Mini Badges til spillere i tooltip */
+        .player-badge {
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+
+        .player-badge-pro {
+            background: var(--pro-gradient);
+            color: #ffffff;
+            box-shadow: 0 0 8px var(--pro-glow);
+        }
+
+        .player-badge-vip {
+            background: var(--vip-gradient);
+            color: #ffffff;
+            box-shadow: 0 0 8px var(--vip-glow);
         }
 
         .version-tag {
@@ -536,7 +671,16 @@
     <div class="container">
         <div class="header">
             <h1>SuperAwesome Servere</h1>
-            <p>Vælg om servere med eller uden whitelist skal vises herunder:</p>
+            <p>Skriv for at søge efter spillere, servere, kategorier osv.:</p>
+
+            <!-- Custom Live-Søgefelt -->
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Søg på spiller, server eller kategori..." oninput="handleSearchInput()">
+                    <button id="clearBtn" class="clear-btn" onclick="clearSearch()" title="Nulstil søgning">×</button>
+                </div>
+            </div>
             
             <!-- Minecraft Style Filter Component -->
             <div class="mc-filter-container">
@@ -571,7 +715,7 @@
                 <thead>
                     <tr>
                         <th>Status</th>
-                        <th>Server Navn</th>
+                        <th>Server</th>
                         <th>Kategori</th>
                         <th id="thPlayers" class="sortable active" onclick="toggleSort()">
                             Spillere <span id="sortIcon" class="sort-icon">▼</span>
@@ -591,13 +735,14 @@
         let currentSortDirection = 'desc'; 
         let timeLeft = 15;
         let whitelistFilterMode = 'off'; // 'off' = uden, 'on' = med, 'all' = begge
+        let currentSearchQuery = '';
 
         async function fetchServers() {
             const statusEl = document.getElementById('status');
             const tableContainerEl = document.getElementById('tableContainer');
 
             try {
-                const response = await fetch('https://api.superawesome.dk/servers?size=50');
+                const response = await fetch('https://api.superawesome.dk/servers?size=500');
                 
                 if (!response.ok) {
                     throw new Error(`Fejl ved hentning: ${response.status}`);
@@ -618,6 +763,27 @@
             }
 
             timeLeft = 15;
+        }
+
+        function handleSearchInput() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+
+            currentSearchQuery = input.value.trim().toLowerCase();
+
+            if (currentSearchQuery.length > 0) {
+                clearBtn.style.display = 'inline-block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+
+            renderTable();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            input.value = '';
+            handleSearchInput();
         }
 
         function toggleWhitelistFilter() {
@@ -657,14 +823,16 @@
 
             return players.map(p => {
                 if (typeof p === 'string') {
-                    return { username: p, identifier: p };
+                    return { username: p, identifier: p, isPro: false, isVip: false };
                 } else if (typeof p === 'object' && p !== null) {
                     return { 
                         username: p.username || p.name || 'Spiller', 
-                        identifier: p.uuid || p.username || 'steve' 
+                        identifier: p.uuid || p.username || 'steve',
+                        isPro: p.pro || p.isPro || p.rank === 'PRO' || (p.roles && p.roles.includes('PRO')) || false,
+                        isVip: p.vip || p.isVip || p.rank === 'VIP' || (p.roles && p.roles.includes('VIP')) || false
                     };
                 }
-                return { username: 'Spiller', identifier: 'steve' };
+                return { username: 'Spiller', identifier: 'steve', isPro: false, isVip: false };
             });
         }
 
@@ -719,8 +887,7 @@
 
             tipViser.textContent = `Viser: ${currentlyShownCount} servere`;
 
-            // Filtrér serverne ud fra det valgte filter
-            const filteredServers = activeServers.filter(server => {
+            let filteredServers = activeServers.filter(server => {
                 const isWhitelisted = server.whitelist === "true" || server.whitelist === true;
                 const isNotWhitelisted = server.whitelist === "false" || server.whitelist === false;
 
@@ -729,18 +896,36 @@
                 return true;
             });
 
-            // Beregn spillere & servere DER VISES LIGE NU
+            if (currentSearchQuery !== '') {
+                filteredServers = filteredServers.filter(server => {
+                    const serverName = (server.name || server.serverName || '').toLowerCase();
+                    const category = (server.category || '').toLowerCase();
+                    const version = (server.version || '').toLowerCase();
+                    const description = (server.descriptionLong || server.description || '').toLowerCase();
+
+                    const playerList = extractPlayersList(server);
+                    const hasMatchingPlayer = playerList.some(p => p.username.toLowerCase().includes(currentSearchQuery));
+
+                    return serverName.includes(currentSearchQuery) ||
+                           category.includes(currentSearchQuery) ||
+                           version.includes(currentSearchQuery) ||
+                           description.includes(currentSearchQuery) ||
+                           hasMatchingPlayer;
+                });
+            }
+
             const shownTotalPlayers = filteredServers.reduce((sum, s) => sum + getPlayerCount(s), 0);
             const shownTotalServers = filteredServers.length;
 
-            // Opdater badgen i øverste højre hjørne med de synlige tal
             document.getElementById('totalPlayers').textContent = shownTotalPlayers;
             document.getElementById('totalServers').textContent = shownTotalServers;
 
             if (filteredServers.length === 0) {
                 statusEl.style.display = 'block';
                 tableContainerEl.style.display = 'none';
-                statusEl.innerHTML = 'Ingen servere fundet med det valgte filter.';
+                statusEl.innerHTML = currentSearchQuery !== '' 
+                    ? `Ingen resultat fundet for "<strong>${document.getElementById('searchInput').value}</strong>".`
+                    : 'Ingen servere fundet med det valgte filter.';
                 return;
             }
 
@@ -774,12 +959,24 @@
 
                 let playerItemsHtml = '';
                 if (playerList.length > 0) {
-                    playerItemsHtml = playerList.map(p => `
-                        <div class="player-list-item">
-                            <img class="player-head-img" src="https://mc-heads.net/avatar/${p.identifier}/24" alt="${p.username}">
-                            <span class="player-name-text">${p.username}</span>
-                        </div>
-                    `).join('');
+                    playerItemsHtml = playerList.map(p => {
+                        let playerBadgeHtml = '';
+                        if (p.isPro) {
+                            playerBadgeHtml = '<span class="player-badge player-badge-pro">PRO</span>';
+                        } else if (p.isVip) {
+                            playerBadgeHtml = '<span class="player-badge player-badge-vip">VIP</span>';
+                        }
+
+                        return `
+                            <div class="player-list-item">
+                                <div class="player-info-left">
+                                    <img class="player-head-img" src="https://mc-heads.net/avatar/${p.identifier}/24" alt="${p.username}">
+                                    <span class="player-name-text">${p.username}</span>
+                                </div>
+                                ${playerBadgeHtml}
+                            </div>
+                        `;
+                    }).join('');
                 } else {
                     playerItemsHtml = '<div style="font-size:0.8rem; color:#94a3b8;">Ingen detaljer fundet</div>';
                 }
@@ -794,25 +991,28 @@
                     </div>
                 `;
 
+                const rawName = server.name || server.serverName || 'Ukendt';
+                const rawCategory = server.category || 'Ingen';
+                const rawVersion = server.version || 'Ukendt';
+                const rawDesc = server.descriptionLong || server.description || 'Denne server har ingen beskrivelse endnu.';
+
                 row.innerHTML = `
                     <td>${badgeHtml}</td>
-                    <td><span class="server-name">${server.name || server.serverName || 'Ukendt'}</span></td>
-                    <td><span class="category-pill">${server.category || 'Ingen'}</span></td>
+                    <td><span class="server-name">${rawName}</span></td>
+                    <td><span class="category-pill">${rawCategory}</span></td>
                     <td>${playersCellHtml}</td>
                     <td>${whitelistBadge}</td>
-                    <td><span class="version-tag">${server.version || 'Ukendt'}</span></td>
-                    <td><div class="description">${server.descriptionLong || server.description || 'Ingen beskrivelse tilgængelig'}</div></td>
+                    <td><span class="version-tag">${rawVersion}</span></td>
+                    <td><div class="description">${rawDesc}</div></td>
                 `;
 
                 listEl.appendChild(row);
             });
         }
 
-        // Start
         fetchServers();
         setInterval(fetchServers, 15000);
 
-        // Nedtælling
         setInterval(() => {
             if (timeLeft > 0) timeLeft--;
             document.getElementById('countdown').textContent = timeLeft;
